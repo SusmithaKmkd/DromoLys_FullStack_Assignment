@@ -34,7 +34,7 @@ Open the application in the browser and upload CSV files using :
 
 **API Endpoints Implemented**
 -------------------------
-> Upload CSV File
+1. Upload CSV File
 
 Endpoint: /api/upload/
 
@@ -42,7 +42,7 @@ Method: POST
 
 Description: Uploads a CSV file and stores it on the server. Returns a unique dataset_id for further operations.
 
-> View Uploaded Dataset as Table
+2. View Uploaded Dataset as Table
 
 Endpoint: /api/dataset/<dataset_id>/table/
 
@@ -50,7 +50,7 @@ Method: GET
 
 Description: Returns column names and rows of the uploaded CSV file for rendering as a table in the UI.
 
-> Column Statistics
+3. Column Statistics
 
 Endpoint: /api/dataset/<dataset_id>/column/<column_name>/stats/
 
@@ -64,7 +64,7 @@ Categorical columns: mode
 
 Missing/invalid values are ignored in numeric calculations and reported separately.
 
-> Column Histogram
+ 4.Column Histogram
 
 Endpoint: /api/dataset/<dataset_id>/column/<column_name>/histogram/
 
