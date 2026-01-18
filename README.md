@@ -1,7 +1,11 @@
 **Tech Stack**
+
     > Backend: Python 3, Django, Django REST–style APIs
+    
     > Frontend: HTML5, CSS3, Vanilla JavaScript (Fetch API)
+    
 **Setup & Run Instructions (Local)**
+
     > Navigate to the project root directory:
     > DromoLys_FullStack_Assignment
 Activate the virtual environment named env:
