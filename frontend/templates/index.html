@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CSV Analyzer</title>
+
+    <!-- CSS GOES HERE -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            display: flex;
+        }
+
+        .table-area {
+            width: 70%;
+            padding: 10px;
+        }
+
+        .analysis-panel {
+            width: 30%;
+            padding: 10px;
+            border-left: 2px solid #ccc;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>Upload CSV File</h2>
+<input type="file" id="csvFile">
+<button onclick="uploadCSV()">Upload</button>
+
+<hr>
+
+<div class="container">
+
+    <!-- LEFT SIDE -->
+    <div class="table-area">
+        <h3>Table Data</h3>
+        <table id="dataTable"></table>
+    </div>
+
+    <!-- RIGHT SIDE -->
+    <div class="analysis-panel">
+        <h3>Column Analysis</h3>
+
+        <select id="columnName"></select>
+        <br><br>
+
+        <button onclick="getStats()">Get Statistics</button>
+        <button onclick="getHistogram()">Get Histogram</button>
+
+        <hr>
+        <pre id="output"></pre>
+    </div>
+
+</div>
+
+<!-- JAVASCRIPT GOES HERE -->
+<script>
+let datasetId = null;
+
+function uploadCSV() {
+    const fileInput = document.getElementById('csvFile');
+    const formData = new FormData();
+    formData.append('file', fileInput.files[0]);
+
+    fetch('/api/upload/', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        datasetId = data.dataset_id;
+        loadTable();
+    });
+}
+
+function loadTable() {
+    fetch(`/api/dataset/${datasetId}/table/`)
+    .then(res => res.json())
+    .then(data => {
+        const table = document.getElementById('dataTable');
+        table.innerHTML = '';
+
+        // Populate dropdown
+        const select = document.getElementById('columnName');
+        select.innerHTML = '';
+        data.columns.forEach(col => {
+            const opt = document.createElement('option');
+            opt.value = col;
+            opt.text = col;
+            select.appendChild(opt);
+        });
+
+        // Table header
+        const header = table.insertRow();
+        data.columns.forEach(col => {
+            const th = document.createElement('th');
+            th.innerText = col;
+            header.appendChild(th);
+        });
+
+        // Table rows
+        data.rows.forEach(row => {
+            const tr = table.insertRow();
+            data.columns.forEach(col => {
+                tr.insertCell().innerText = row[col];
+            });
+        });
+    });
+}
+
+function getStats() {
+    const col = document.getElementById('columnName').value;
+
+    fetch(`/api/dataset/${datasetId}/column/${col}/stats/`)
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById('output').innerText =
+            JSON.stringify(data, null, 2);
+    });
+}
+
+function getHistogram() {
+    const col = document.getElementById('columnName').value;
+
+    fetch(`/api/dataset/${datasetId}/column/${col}/histogram/`)
+    .then(res => res.json())
+    .then(data => {
+        if (!data.bins || data.bins.length === 0) {
+            document.getElementById('output').innerText =
+                "No numeric data available for histogram.";
+            return;
+        }
+
+        let text = '';
+        data.bins.forEach(bin => {
+            text += `${bin.range} : ${'#'.repeat(bin.count)}\n`;
+        });
+
+        document.getElementById('output').innerText = text;
+    });
+}
+
+</script>
+
+</body>
+</html>
